@@ -1,6 +1,6 @@
 package cc.doctor.utils.utils;
 
-import cc.doctor.framework.annotation.Nullable;
+import cc.doctor.utils.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

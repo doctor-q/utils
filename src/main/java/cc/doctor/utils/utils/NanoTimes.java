@@ -5,6 +5,13 @@ import java.time.Instant;
 import java.time.ZoneId;
 
 public class NanoTimes {
+
+    private NanoTimes() {
+    }
+
+    /**
+     * @since 1.8
+     */
     public static class NanoClock extends Clock {
         private final Clock clock;
 
@@ -41,6 +48,7 @@ public class NanoTimes {
             return System.nanoTime();
         }
     }
+
     private static final Clock clock = new NanoClock();
 
     public static Instant nanoTime() {

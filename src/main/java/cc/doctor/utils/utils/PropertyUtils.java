@@ -14,7 +14,10 @@ import java.util.*;
  */
 public class PropertyUtils {
     public static final Logger log = LoggerFactory.getLogger(PropertyUtils.class);
-    private static Map<String, Object> properties = new HashMap<>();
+    private static Map<String, String> properties = new HashMap<>();
+
+    private PropertyUtils() {
+    }
 
     static {
         String env = null;
@@ -24,7 +27,7 @@ public class PropertyUtils {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 if (line.startsWith("project_env")) {
-                    env = line.split("=") [1];
+                    env = line.split("=")[1];
                     break;
                 }
             }
@@ -32,7 +35,7 @@ public class PropertyUtils {
             log.error("", e);
         }
         if (env == null) {
-            env  = "local";
+            env = "local";
         }
         loadProperties(env + ".properties");
     }
@@ -53,39 +56,43 @@ public class PropertyUtils {
     }
 
     public static <T> T getProperty(String key, T defaultValue) {
-        T value = (T) properties.get(key);
+        String v = properties.get(key);
+        if (v == null) {
+            return null;
+        }
+        T value = (T) FormatUtils.parseValue(v, defaultValue.getClass());
         return value == null ? defaultValue : value;
     }
 
-    public static void setProperty(String key, Object value) {
+    public static void setProperty(String key, String value) {
         properties.put(key, value);
     }
 
-    public static String getString (String key, String defaultValue) {
-        return properties.get(key) == null ? defaultValue : properties.get(key).toString();
+    public static String getString(String key, String defaultValue) {
+        return properties.get(key) == null ? defaultValue : properties.get(key);
     }
 
     public static Boolean getBoolean(String key, Boolean defaultValue) {
-        return properties.get(key) == null ? defaultValue : Boolean.parseBoolean(properties.get(key).toString());
+        return properties.get(key) == null ? defaultValue : Boolean.parseBoolean(properties.get(key));
     }
 
     public static Integer getInteget(String key, Integer defaultValue) {
-        return properties.get(key) == null ? defaultValue : Integer.parseInt(properties.get(key).toString());
+        return properties.get(key) == null ? defaultValue : Integer.parseInt(properties.get(key));
     }
 
     public static Long getLong(String key, Long defaultValue) {
-        return properties.get(key) == null ? defaultValue : Long.parseLong(properties.get(key).toString());
+        return properties.get(key) == null ? defaultValue : Long.parseLong(properties.get(key));
     }
 
     public static Float getFloat(String key, Float defaultValue) {
-        return properties.get(key) == null ? defaultValue : Float.parseFloat(properties.get(key).toString());
+        return properties.get(key) == null ? defaultValue : Float.parseFloat(properties.get(key));
     }
 
     public static Double getDouble(String key, Double defaultValue) {
-        return properties.get(key) == null ? defaultValue : Double.parseDouble(properties.get(key).toString());
+        return properties.get(key) == null ? defaultValue : Double.parseDouble(properties.get(key));
     }
 
     public static List<String> getList(String key, String separator) {
-        return properties.get(key) == null ? new LinkedList<String>() : Arrays.asList(properties.get(key).toString().split(separator));
+        return properties.get(key) == null ? new LinkedList<>() : Arrays.asList(properties.get(key).split(separator));
     }
 }

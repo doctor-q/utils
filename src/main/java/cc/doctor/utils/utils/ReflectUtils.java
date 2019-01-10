@@ -39,7 +39,7 @@ public class ReflectUtils {
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         Class<?>[] parameterTypes = method.getParameterTypes();
         for (int i = 0; i < parameterTypes.length; i++) {
-            typeAnnotations.add(new Tuple<Class, Annotation[]>(parameterTypes[i], parameterAnnotations[i]));
+            typeAnnotations.add(new Tuple<>(parameterTypes[i], parameterAnnotations[i]));
         }
         return typeAnnotations;
 

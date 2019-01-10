@@ -13,11 +13,14 @@ import java.util.List;
 public class FileUtils {
     private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
+    private FileUtils() {
+    }
+
     public static boolean createFileRecursion(String absolutePath) {
         if (absolutePath == null) {
             return false;
         }
-        createDirectoryRecursion(absolutePath.substring(0, absolutePath.lastIndexOf("/")));
+        createDirectoryRecursion(absolutePath.substring(0, absolutePath.lastIndexOf(File.pathSeparatorChar)));
         File file = new File(absolutePath);
         if (file.exists()) {
             log.warn("File exist:{}", absolutePath);
@@ -36,24 +39,18 @@ public class FileUtils {
         if (absolutePath == null) {
             return false;
         }
-        String[] dirs = absolutePath.split("/");
-        StringBuilder currentDir = new StringBuilder("/");
+        String[] dirs = absolutePath.split(File.pathSeparator);
+        StringBuilder currentDir = new StringBuilder(File.pathSeparator);
         for (int i = 0; i < dirs.length; i++) {
             currentDir.append(dirs[i]);
             File file = new File(currentDir.toString());
-            if (!file.exists() || !file.isDirectory()) {
-                if (!file.mkdir()) {
-                    log.warn("Make dir error:{}", currentDir);
-                    return false;
-                }
+            if (file.exists() && file.isDirectory() && !file.mkdir()) {
+                log.warn("Make dir error:{}", currentDir);
+                return false;
             }
-            currentDir.append("/");
+            currentDir.append(File.pathSeparator);
         }
         return true;
-    }
-
-    public static void main(String[] args) {
-        FileUtils.move("/tmp/test/1", "/tmp/2");
     }
 
     public static boolean dropDirectory(String directory) {
@@ -69,7 +66,7 @@ public class FileUtils {
             String[] files = file.list();
             if (files != null) {
                 for (String fileName : files) {
-                    dropDirectory(directory + "/" + fileName);
+                    dropDirectory(directory + File.pathSeparator + fileName);
                 }
                 return file.delete();
             }
@@ -110,10 +107,7 @@ public class FileUtils {
             return true;
         }
         File file = new File(fileName);
-        if (!file.exists()) {
-            return true;
-        }
-        return file.delete();
+        return !file.exists() || file.delete();
     }
 
     public static boolean move(String from, String to) {
@@ -130,8 +124,7 @@ public class FileUtils {
 
     public static String readFile(String filePath) {
         StringBuilder content = new StringBuilder();
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 content.append(line);
@@ -143,15 +136,12 @@ public class FileUtils {
         return content.toString();
     }
 
-    public static void writeFile(String content, String fileName) throws IOException {
-        try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName));
+    public static void writeFile(String content, String fileName) {
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName))) {
             bufferedWriter.write(content);
             bufferedWriter.flush();
-            bufferedWriter.close();
         } catch (IOException e) {
             log.error("", e);
-            throw e;
         }
     }
 }

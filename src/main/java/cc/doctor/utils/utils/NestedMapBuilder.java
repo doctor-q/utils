@@ -47,7 +47,7 @@ public class NestedMapBuilder {
 
     public Map<String, Object> build() {
         if (level != 0) {
-            throw new RuntimeException("Level is not 0");
+            throw new IllegalStateException("Level is not 0");
         }
         return root.getMap();
     }
